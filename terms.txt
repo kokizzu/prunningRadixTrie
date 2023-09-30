@@ -1,0 +1,6 @@
+app	3
+appeti	2
+appetizer	3
+appetite	2
+apple	5
+banana	4
