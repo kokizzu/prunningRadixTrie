@@ -1,23 +1,23 @@
 package prunningRadixTrie
 
 import (
-	"math/rand"
 	"fmt"
-	"testing"
+	"math/rand"
 	"strconv"
+	"testing"
 )
 
 func BenchmarkAddTopKSuggestion(b *testing.B) {
 	trie := NewPruningRadixTrie()
 	results := make([]struct {
-		term              string
+		term               string
 		termFrequencyCount int64
 	}, 0)
 
 	// Initialize the results slice with some data
 	for i := 0; i < 100; i++ {
 		results = append(results, struct {
-			term              string
+			term               string
 			termFrequencyCount int64
 		}{term: "term" + strconv.Itoa(i), termFrequencyCount: int64(rand.Intn(100))})
 	}
@@ -32,7 +32,7 @@ func BenchmarkAddTopKSuggestion(b *testing.B) {
 	}
 }
 
-func ExampleAddTopKSuggestion() {
+func ExamplePruningRadixTrie_GetTopkTermsForPrefix() {
 	trie := NewPruningRadixTrie()
 	trie.AddTerm("apple", 5)
 	trie.AddTerm("appetizer", 3)
@@ -46,5 +46,10 @@ func ExampleAddTopKSuggestion() {
 	}
 	fmt.Println("Term Frequency Count Prefix:", termFrequencyCountPrefix)
 
-	trie.WriteTermsToFile("terms.txt")
+	// Output:
+	// Top K Terms:
+	// apple: 5
+	// appetizer: 3
+	// appetite: 2
+	// Term Frequency Count Prefix: 0
 }

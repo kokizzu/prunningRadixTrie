@@ -1,22 +1,22 @@
 package prunningRadixTrie
 
 import (
-	"fmt"
-	"math"
-	"sort"
-	"io"
 	"bufio"
+	"fmt"
+	"io"
+	"math"
+	"os"
+	"sort"
 	"strconv"
 	"strings"
-	"os"
 )
 
 type Node struct {
-	Children                []struct {
+	Children []struct {
 		key  string
 		node *Node
 	}
-	termFrequencyCount      int64
+	termFrequencyCount         int64
 	termFrequencyCountChildMax int64
 }
 
@@ -27,9 +27,9 @@ func NewNode(termFrequencyCount int64) *Node {
 }
 
 type PruningRadixTrie struct {
-	termCount      int64
+	termCount       int64
 	termCountLoaded int64
-	trie           *Node
+	trie            *Node
 }
 
 func NewPruningRadixTrie() *PruningRadixTrie {
@@ -44,11 +44,11 @@ func (t *PruningRadixTrie) AddTerm(term string, termFrequencyCount int64) {
 }
 
 func (t *PruningRadixTrie) UpdateMaxCounts(nodeList []*Node, termFrequencyCount int64) {
- 	for _, node := range nodeList {
-        if termFrequencyCount > node.termFrequencyCountChildMax {
-            node.termFrequencyCountChildMax = termFrequencyCount
-        }
-    }
+	for _, node := range nodeList {
+		if termFrequencyCount > node.termFrequencyCountChildMax {
+			node.termFrequencyCountChildMax = termFrequencyCount
+		}
+	}
 }
 
 func (t *PruningRadixTrie) addTerm(curr *Node, term string, termFrequencyCount int64, id int, level int, nodeList *[]*Node) {
@@ -99,7 +99,7 @@ func (t *PruningRadixTrie) addTerm(curr *Node, term string, termFrequencyCount i
 					t.addTerm(child, term[common:], termFrequencyCount, id, level+1, nodeList)
 				} else {
 					newChild := &Node{
-						termFrequencyCount: termFrequencyCount,
+						termFrequencyCount: 0,
 						Children: []struct {
 							key  string
 							node *Node
@@ -145,14 +145,14 @@ func (t *PruningRadixTrie) addTerm(curr *Node, term string, termFrequencyCount i
 }
 
 func (t *PruningRadixTrie) FindAllChildTerms(prefix string, topK int, termFrequencyCountPrefix *int64, prefixString string, results *[]struct {
-	term              string
+	term               string
 	termFrequencyCount int64
 }, pruning bool) {
 	t.findAllChildTerms(prefix, t.trie, topK, termFrequencyCountPrefix, prefixString, results, nil, pruning)
 }
 
 func (t *PruningRadixTrie) findAllChildTerms(prefix string, curr *Node, topK int, termFrequencyCountPrefix *int64, prefixString string, results *[]struct {
-	term              string
+	term               string
 	termFrequencyCount int64
 }, file io.Writer, pruning bool) {
 	if pruning && topK > 0 && len(*results) == topK && curr.termFrequencyCountChildMax <= (*results)[topK-1].termFrequencyCount {
@@ -186,7 +186,7 @@ func (t *PruningRadixTrie) findAllChildTerms(prefix string, curr *Node, topK int
 						t.addTopKSuggestion(prefixString+key, node.termFrequencyCount, topK, results)
 					} else {
 						*results = append(*results, struct {
-							term              string
+							term               string
 							termFrequencyCount int64
 						}{prefixString + key, node.termFrequencyCount})
 					}
@@ -209,11 +209,11 @@ func (t *PruningRadixTrie) findAllChildTerms(prefix string, curr *Node, topK int
 }
 
 func (t *PruningRadixTrie) GetTopkTermsForPrefix(prefix string, topK int, pruning bool) ([]struct {
-	term              string
+	term               string
 	termFrequencyCount int64
 }, int64) {
 	results := make([]struct {
-		term              string
+		term               string
 		termFrequencyCount int64
 	}, 0)
 
@@ -272,7 +272,7 @@ func (t *PruningRadixTrie) ReadTermsFromFile(path string) bool {
 }
 
 func (t *PruningRadixTrie) addTopKSuggestion(term string, termFrequencyCount int64, topK int, results *[]struct {
-	term              string
+	term               string
 	termFrequencyCount int64
 }) {
 	if len(*results) < topK || termFrequencyCount >= (*results)[topK-1].termFrequencyCount {
@@ -280,11 +280,11 @@ func (t *PruningRadixTrie) addTopKSuggestion(term string, termFrequencyCount int
 			return termFrequencyCount > (*results)[i].termFrequencyCount
 		})
 		newResult := struct {
-			term              string
+			term               string
 			termFrequencyCount int64
 		}{term, termFrequencyCount}
 		*results = append(*results, struct {
-			term              string
+			term               string
 			termFrequencyCount int64
 		}{})
 
